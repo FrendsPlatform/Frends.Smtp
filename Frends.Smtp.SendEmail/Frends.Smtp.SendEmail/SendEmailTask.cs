@@ -12,7 +12,7 @@ namespace Frends.SMTP.SendEmail
     /// <summary>
     /// SMTP Task.
     /// </summary>
-    public static class Smtp
+    public static class SMTP
     {
         /// <summary>
         /// Frends Task for sending emails with optional attachments using SMTP protocol.
