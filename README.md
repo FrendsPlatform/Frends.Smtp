@@ -1,6 +1,6 @@
 # Frends.SMTP
 
-Frends tasks for SMTP protocol.
+Frends Task for SMTP protocol.
 
 # Tasks
 

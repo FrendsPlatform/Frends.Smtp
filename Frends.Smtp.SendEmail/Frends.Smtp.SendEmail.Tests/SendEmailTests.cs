@@ -42,7 +42,7 @@ namespace Frends.SMTP.SendEmail.Tests
             _filepath = Path.Combine(_localAttachmentFolder, TEST_FILE_NAME);
 
             if (!File.Exists(_filepath))
-                using (File.Create(_filepath)) { }
+                using (File.Create(_filepath))
 
             _input = new Input()
             {
@@ -81,8 +81,7 @@ namespace Frends.SMTP.SendEmail.Tests
         {
             var input = _input;
             input.Subject = "Email test - PlainText";
-
-            var result = SMTP.SendEmail(input, null, _options, new System.Threading.CancellationToken());
+            var result = Smtp.SendEmail(input, null, _options, new System.Threading.CancellationToken());
             Assert.IsTrue(result.EmailSent);
         }
 
@@ -99,10 +98,8 @@ namespace Frends.SMTP.SendEmail.Tests
                 ThrowExceptionIfAttachmentNotFound = true
             };
 
-
             var Attachments = new Attachment[] { attachment };
-
-            var result = SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
+            var result = Smtp.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
             Assert.IsTrue(result.EmailSent);
         }
 
@@ -115,11 +112,11 @@ namespace Frends.SMTP.SendEmail.Tests
             var attachment = new Attachment()
             {
                 AttachmentType = AttachmentType.AttachmentFromString,
-                stringAttachment = fileAttachment
+                StringAttachment = fileAttachment
             };
+            
             var Attachments = new Attachment[] { attachment };
-
-            var result = SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
+            var result = Smtp.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
             Assert.IsTrue(result.EmailSent);
         }
 
@@ -136,10 +133,8 @@ namespace Frends.SMTP.SendEmail.Tests
                 ThrowExceptionIfAttachmentNotFound = false
             };
 
-
             var Attachments = new Attachment[] { attachment };
-
-            var result = SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
+            var result = Smtp.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
             Assert.IsFalse(result.EmailSent);
         }
 
@@ -156,11 +151,8 @@ namespace Frends.SMTP.SendEmail.Tests
                 ThrowExceptionIfAttachmentNotFound = true
             };
 
-
             var Attachments = new Attachment[] { attachment };
-
-            Assert.Throws<FileNotFoundException>(() => SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken()));
-
+            Assert.Throws<FileNotFoundException>(() => Smtp.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken()));
         }
     }
 }
