@@ -5,7 +5,7 @@ using System.IO;
 namespace Frends.SMTP.SendEmail.Tests
 {
     /// <summary>
-    /// NOTE: To run these unit tests, you need an SMTP test server. Fill in the properties below with your values. 
+    /// NOTE: To run these unit tests, you need an SMTP test server. Fill in the properties below with your values.
     /// </summary>
     [TestFixture]
     public class SendEmailTests

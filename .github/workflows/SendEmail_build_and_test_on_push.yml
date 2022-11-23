@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'Frends.SMTP.SendEmail/**'
-      - 'Frends.SMTP.SendEmail.Tests/**'
   workflow_dispatch:
   
 jobs:
