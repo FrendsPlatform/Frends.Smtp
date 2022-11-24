@@ -42,7 +42,7 @@ namespace Frends.SMTP.SendEmail.Tests
             _filepath = Path.Combine(_localAttachmentFolder, TEST_FILE_NAME);
 
             if (!File.Exists(_filepath))
-                using (File.Create(_filepath)) { }
+                using (File.Create(_filepath))
 
             _input = new Input()
             {
@@ -115,7 +115,7 @@ namespace Frends.SMTP.SendEmail.Tests
             var attachment = new Attachment()
             {
                 AttachmentType = AttachmentType.AttachmentFromString,
-                stringAttachment = fileAttachment
+                StringAttachment = fileAttachment
             };
             var Attachments = new Attachment[] { attachment };
 
