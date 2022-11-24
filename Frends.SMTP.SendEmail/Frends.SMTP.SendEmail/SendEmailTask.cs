@@ -30,11 +30,10 @@ public static class SMTP
         using var mail = InitializeMailMessage(message);
         if (attachments != null)
         {
-            foreach (var attachment in attachments.StringAttachment)
+            switch (attachments.AttachmentType)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                if (attachments.AttachmentType == AttachmentType.FileAttachment)
-                {
+                case AttachmentType.FileAttachment:
+                    cancellationToken.ThrowIfCancellationRequested();
                     ICollection<string> allAttachmentFilePaths = GetAttachmentFiles(attachments.FilePath);
 
                     if (attachments.ThrowExceptionIfAttachmentNotFound && allAttachmentFilePaths.Count == 0)
@@ -45,10 +44,14 @@ public static class SMTP
 
                     foreach (var fp in allAttachmentFilePaths)
                         mail.Attachments.Add(new Attachment(fp));
-                }
-
-                if (attachments.AttachmentType == AttachmentType.AttachmentFromString && !string.IsNullOrEmpty(attachment.FileContent))
-                    mail.Attachments.Add(Attachment.CreateAttachmentFromString(attachment.FileContent, attachment.FileName));
+                    break;
+                case AttachmentType.AttachmentFromString:
+                    foreach (var attachment in attachments.StringAttachment)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        mail.Attachments.Add(Attachment.CreateAttachmentFromString(attachment.FileContent, attachment.FileName));
+                    }
+                    break;
             }
         }
         client.Send(mail);

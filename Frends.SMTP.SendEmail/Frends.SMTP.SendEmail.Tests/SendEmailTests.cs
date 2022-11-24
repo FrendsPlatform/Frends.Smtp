@@ -3,152 +3,230 @@ using NUnit.Framework;
 using System;
 using System.IO;
 
-namespace Frends.SMTP.SendEmail.Tests;
-
-/// <summary>
-/// NOTE: To run these unit tests, you need an SMTP test server. Fill in the properties below with your values.
-/// </summary>
-[TestFixture]
-public class SendEmailTests
+namespace Frends.SMTP.SendEmail.Tests
 {
-    // ****************************************** FILL THESE ******************************************************
-    private const string USERNAME = "apikey";
-    private const string PASSWORD = "";
-    private const string SMTPADDRESS = "smtp.sendgrid.net";
-    private const string TOEMAILADDRESS = "jefim.borissov@hiq.fi";
-    private const string FROMEMAILADDRESS = "jefim.borissov@hiq.fi";
-    private const int PORT = 587;
-    private const bool USESSL = true;
-    private const bool USEWINDOWSAUTHENTICATION = false;
-    // ************************************************************************************************************
-
-
-    private const string TEMP_ATTACHMENT_SOURCE = "emailtestattachments";
-    private const string TEST_FILE_NAME = "testattachment.txt";
-    private const string TEST_FILE_NOT_EXISTING = "doesntexist.txt";
-
-    private string _localAttachmentFolder;
-    private string _filepath;
-    private Input _input;
-    private Options _options;
-
-    [SetUp]
-    public void EmailTestSetup()
+    /// <summary>
+    /// NOTE: To run these unit tests, you need an SMTP test server. Fill in the properties below with your values.
+    /// </summary>
+    [TestFixture]
+    public class SendEmailTests
     {
-        _localAttachmentFolder = Path.Combine(Path.GetTempPath(), TEMP_ATTACHMENT_SOURCE);
+        // ****************************************** FILL THESE ******************************************************
+        private const string USERNAME = "apikey";
+        private const string PASSWORD = "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";
+        private const string SMTPADDRESS = "smtp.sendgrid.net";
+        private const string TOEMAILADDRESS = "jefim.borissov@hiq.fi";
+        private const string FROMEMAILADDRESS = "jefim.borissov@hiq.fi";
+        private const int PORT = 587;
+        private const bool USESSL = true;
+        private const bool USEWINDOWSAUTHENTICATION = false;
+        // ************************************************************************************************************
 
-        if (!Directory.Exists(_localAttachmentFolder))
-            Directory.CreateDirectory(_localAttachmentFolder);
 
-        _filepath = Path.Combine(_localAttachmentFolder, TEST_FILE_NAME);
+        private const string TEMP_ATTACHMENT_SOURCE = "emailtestattachments";
+        private const string TEST_FILE_NAME = "testattachment.txt";
+        private const string TEST_FILE_NOT_EXISTING = "doesntexist.txt";
+        private readonly string passwordFromEnvironment = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 
-        if (!File.Exists(_filepath))
-            using (File.Create(_filepath))
+        private string _localAttachmentFolder;
+        private string _filepath;
 
-        _input = new Input()
+        [SetUp]
+        public void EmailTestSetup()
         {
-            From = FROMEMAILADDRESS,
-            To = TOEMAILADDRESS,
-            Cc = "",
-            Bcc = "",
-            Message = "testmsg",
-            IsMessageHtml = false,
-            SenderName = "EmailTestSender",
-            MessageEncoding = "utf-8"
-        };
+            _localAttachmentFolder = Path.Combine(Path.GetTempPath(), TEMP_ATTACHMENT_SOURCE);
 
-        var passwordFromEnvironment = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
+            if (!Directory.Exists(_localAttachmentFolder))
+                Directory.CreateDirectory(_localAttachmentFolder);
 
-        _options = new Options()
+            _filepath = Path.Combine(_localAttachmentFolder, TEST_FILE_NAME);
+            
+            var file = File.Create(_filepath);
+            file.Close();
+        }
+
+        [TearDown]
+        public void EmailTestTearDown()
         {
-            UserName = USERNAME,
-            Password = string.IsNullOrWhiteSpace(passwordFromEnvironment) ? PASSWORD : passwordFromEnvironment,
-            SMTPServer = SMTPADDRESS,
-            Port = PORT,
-            UseSsl = USESSL,
-            UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
-        };
+            if (Directory.Exists(_localAttachmentFolder))
+                Directory.Delete(_localAttachmentFolder, true);
+        }
 
-    }
-    [TearDown]
-    public void EmailTestTearDown()
-    {
-        if (Directory.Exists(_localAttachmentFolder))
-            Directory.Delete(_localAttachmentFolder, true);
-    }
-
-    [Test]
-    public void SendEmailWithPlainText()
-    {
-        var input = _input;
-        input.Subject = "Email test - PlainText";
-
-        var result = SMTP.SendEmail(input, null, _options, new System.Threading.CancellationToken());
-        Assert.IsTrue(result.EmailSent);
-    }
-
-    [Test]
-    public void SendEmailWithFileAttachment()
-    {
-        var input = _input;
-        input.Subject = "Email test - FileAttachment";
-
-        var attachment = new Attachments
+        [Test]
+        public void SendEmailWithPlainText()
         {
-            FilePath = _filepath,
-            SendIfNoAttachmentsFound = false,
-            ThrowExceptionIfAttachmentNotFound = true
-        };
+            var input = new Input()
+            {
+                From = FROMEMAILADDRESS,
+                To = TOEMAILADDRESS,
+                Cc = "",
+                Bcc = "",
+                Message = "testmsg",
+                IsMessageHtml = false,
+                SenderName = "EmailTestSender",
+                MessageEncoding = "utf-8",
+                Subject = "Email test - PlainText"
+            };
 
-        var result = SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
-        Assert.IsTrue(result.EmailSent);
-    }
+            var _options = new Options()
+            {
+                UserName = USERNAME,
+                Password = string.IsNullOrWhiteSpace(passwordFromEnvironment) ? PASSWORD : passwordFromEnvironment,
+                SMTPServer = SMTPADDRESS,
+                Port = PORT,
+                UseSsl = USESSL,
+                UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
+            };
 
-    [Test]
-    public void SendEmailWithStringAttachment()
-    {
-        var input = _input;
-        input.Subject = "Email test - AttachmentFromString";
-        var attachment = new Attachments()
+            var result = SMTP.SendEmail(input, null, _options, new System.Threading.CancellationToken());
+            Assert.IsTrue(result.EmailSent);
+        }
+
+        [Test]
+        public void SendEmailWithFileAttachment()
         {
-            AttachmentType = AttachmentType.AttachmentFromString,
-            StringAttachment = new[] { new AttachmentFromString() { FileContent = "teststring ä ö", FileName = "testfilefromstring.txt" } }
-        };
+            var input = new Input()
+            {
+                From = FROMEMAILADDRESS,
+                To = TOEMAILADDRESS,
+                Cc = "",
+                Bcc = "",
+                Message = "testmsg",
+                IsMessageHtml = false,
+                SenderName = "EmailTestSender",
+                MessageEncoding = "utf-8",
+                Subject = "Email test - FileAttachment",
+            };
 
-        var result = SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
-        Assert.IsTrue(result.EmailSent);
-    }
+            var _options = new Options()
+            {
+                UserName = USERNAME,
+                Password = string.IsNullOrWhiteSpace(passwordFromEnvironment) ? PASSWORD : passwordFromEnvironment,
+                SMTPServer = SMTPADDRESS,
+                Port = PORT,
+                UseSsl = USESSL,
+                UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
+            };
 
-    [Test]
-    public void TrySendingEmailWithNoFileAttachmentFound()
-    {
-        var input = _input;
-        input.Subject = "Email test";
+            var attachment = new Attachments
+            {
+                FilePath = _filepath,
+                SendIfNoAttachmentsFound = false,
+                ThrowExceptionIfAttachmentNotFound = true,
+                StringAttachment = null
+            };
 
-        var attachment = new Attachments
+            var result = SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
+            Assert.IsTrue(result.EmailSent);
+        }
+
+        [Test]
+        public void SendEmailWithStringAttachment()
         {
-            FilePath = Path.Combine(_localAttachmentFolder, TEST_FILE_NOT_EXISTING),
-            SendIfNoAttachmentsFound = false,
-            ThrowExceptionIfAttachmentNotFound = false
-        };
+            var input = new Input()
+            {
+                From = FROMEMAILADDRESS,
+                To = TOEMAILADDRESS,
+                Cc = "",
+                Bcc = "",
+                Message = "testmsg",
+                IsMessageHtml = false,
+                SenderName = "EmailTestSender",
+                MessageEncoding = "utf-8",
+                Subject = "Email test - AttachmentFromString",
+            };
 
-        var result = SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
-        Assert.IsFalse(result.EmailSent);
-    }
+            var attachment = new Attachments()
+            {
+                AttachmentType = AttachmentType.AttachmentFromString,
+                StringAttachment = new[] { new AttachmentFromString() { FileContent = "teststring ä ö", FileName = "testfilefromstring.txt" } }
+            };
 
-    [Test]
-    public void TrySendingEmailWithNoFileAttachmentFoundException()
-    {
-        var input = _input;
-        input.Subject = "Email test";
+            var _options = new Options()
+            {
+                UserName = USERNAME,
+                Password = string.IsNullOrWhiteSpace(passwordFromEnvironment) ? PASSWORD : passwordFromEnvironment,
+                SMTPServer = SMTPADDRESS,
+                Port = PORT,
+                UseSsl = USESSL,
+                UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
+            };
 
-        var attachment = new Attachments
+            var result = SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
+            Assert.IsTrue(result.EmailSent);
+        }
+
+        [Test]
+        public void TrySendingEmailWithNoFileAttachmentFound()
         {
-            FilePath = Path.Combine(_localAttachmentFolder, TEST_FILE_NOT_EXISTING),
-            SendIfNoAttachmentsFound = false,
-            ThrowExceptionIfAttachmentNotFound = true
-        };
+            var input = new Input()
+            {
+                From = FROMEMAILADDRESS,
+                To = TOEMAILADDRESS,
+                Cc = "",
+                Bcc = "",
+                Message = "testmsg",
+                IsMessageHtml = false,
+                SenderName = "EmailTestSender",
+                MessageEncoding = "utf-8",
+                Subject = "Email test",
+            };
 
-        Assert.Throws<FileNotFoundException>(() => SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken()));
+            var attachment = new Attachments
+            {
+                FilePath = Path.Combine(_localAttachmentFolder, TEST_FILE_NOT_EXISTING),
+                SendIfNoAttachmentsFound = false,
+                ThrowExceptionIfAttachmentNotFound = false
+            };
+
+            var _options = new Options()
+            {
+                UserName = USERNAME,
+                Password = string.IsNullOrWhiteSpace(passwordFromEnvironment) ? PASSWORD : passwordFromEnvironment,
+                SMTPServer = SMTPADDRESS,
+                Port = PORT,
+                UseSsl = USESSL,
+                UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
+            };
+
+            var result = SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
+            Assert.IsFalse(result.EmailSent);
+        }
+
+        [Test]
+        public void TrySendingEmailWithNoFileAttachmentFoundException()
+        {
+            var input = new Input()
+            {
+                From = FROMEMAILADDRESS,
+                To = TOEMAILADDRESS,
+                Cc = "",
+                Bcc = "",
+                Message = "testmsg",
+                IsMessageHtml = false,
+                SenderName = "EmailTestSender",
+                MessageEncoding = "utf-8",
+                Subject = "Email test",
+            };
+
+            var attachment = new Attachments
+            {
+                FilePath = Path.Combine(_localAttachmentFolder, TEST_FILE_NOT_EXISTING),
+                SendIfNoAttachmentsFound = false,
+                ThrowExceptionIfAttachmentNotFound = true
+            };
+
+            var _options = new Options()
+            {
+                UserName = USERNAME,
+                Password = string.IsNullOrWhiteSpace(passwordFromEnvironment) ? PASSWORD : passwordFromEnvironment,
+                SMTPServer = SMTPADDRESS,
+                Port = PORT,
+                UseSsl = USESSL,
+                UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
+            };
+
+            Assert.Throws<FileNotFoundException>(() => SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken()));
+        }
     }
 }
