@@ -13,7 +13,7 @@ namespace Frends.SMTP.SendEmail.Tests
     {
         // ****************************************** FILL THESE ******************************************************
         private const string USERNAME = "apikey";
-        private const string PASSWORD = "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";
+        private const string PASSWORD = "pw";
         private const string SMTPADDRESS = "smtp.sendgrid.net";
         private const string TOEMAILADDRESS = "jefim.borissov@hiq.fi";
         private const string FROMEMAILADDRESS = "jefim.borissov@hiq.fi";
@@ -139,7 +139,7 @@ namespace Frends.SMTP.SendEmail.Tests
             var attachment = new Attachments()
             {
                 AttachmentType = AttachmentType.AttachmentFromString,
-                StringAttachment = new[] { new AttachmentFromString() { FileContent = "teststring ä ö", FileName = "testfilefromstring.txt" } }
+                StringAttachment = new[] { new AttachmentFromString() { FileContent = "teststring Ã¤ Ã¶", FileName = "testfilefromstring.txt" } }
             };
 
             var _options = new Options()
