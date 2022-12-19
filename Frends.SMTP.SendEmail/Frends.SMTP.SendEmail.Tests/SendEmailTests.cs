@@ -8,7 +8,7 @@ namespace Frends.SMTP.SendEmail.Tests;
 /// NOTE: To run these unit tests, you need an SMTP test server.
 /// 
 /// docker run -p 3000:80 -p 2525:25 -d rnwood/smtp4dev:v3
-/// 
+///  
 /// Management console can be found from http://localhost:3000/
 /// 
 /// </summary>
