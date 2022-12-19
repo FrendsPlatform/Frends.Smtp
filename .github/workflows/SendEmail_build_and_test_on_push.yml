@@ -1,0 +1,19 @@
+name: SendEmail Test
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - 'Frends.SMTP.SendEmail/**'
+  workflow_dispatch:
+  
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_test.yml@main
+    with:
+      workdir: Frends.SMTP.SendEmail
+      prebuild_command: docker run -p 3000:80 -p 2525:25 -d rnwood/smtp4dev:v3
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      test_feed_api_key: ${{ secrets.TASKS_TEST_FEED_API_KEY }}
