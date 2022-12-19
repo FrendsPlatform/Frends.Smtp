@@ -1,8 +1,8 @@
-using Frends.Smtp.SendEmail.Definitions;
+using Frends.SMTP.SendEmail.Definitions;
 using NUnit.Framework;
 using System.IO;
 
-namespace Frends.Smtp.SendEmail.Tests;
+namespace Frends.SMTP.SendEmail.Tests;
 
 /// <summary>
 /// NOTE: To run these unit tests, you need an SMTP test server.
