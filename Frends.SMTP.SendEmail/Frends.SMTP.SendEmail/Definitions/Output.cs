@@ -1,4 +1,4 @@
-﻿namespace Frends.SMTP.SendEmail.Definitions;
+﻿namespace Frends.Smtp.SendEmail.Definitions;
 
 /// <summary>
 /// Task's result.

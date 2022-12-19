@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frends.SMTP.SendEmail.Definitions;
+namespace Frends.Smtp.SendEmail.Definitions;
 
 /// <summary>
 /// Options parameters.

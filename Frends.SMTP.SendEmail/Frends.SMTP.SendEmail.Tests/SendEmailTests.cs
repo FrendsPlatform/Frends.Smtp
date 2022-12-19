@@ -1,8 +1,8 @@
-using Frends.SMTP.SendEmail.Definitions;
+using Frends.Smtp.SendEmail.Definitions;
 using NUnit.Framework;
 using System.IO;
 
-namespace Frends.SMTP.SendEmail.Tests;
+namespace Frends.Smtp.SendEmail.Tests;
 
 /// <summary>
 /// NOTE: To run these unit tests, you need an SMTP test server.
@@ -70,7 +70,7 @@ public class SendEmailTests
             UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
         };
 
-        var result = SMTP.SendEmail(input, null, _options, new System.Threading.CancellationToken());
+        var result = Smtp.SendEmail(input, null, _options, default);
         Assert.IsTrue(result.EmailSent);
     }
 
@@ -108,7 +108,7 @@ public class SendEmailTests
             StringAttachment = null
         };
 
-        var result = SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
+        var result = Frends.Smtp.SendEmail(input, attachment, _options, default);
         Assert.IsTrue(result.EmailSent);
     }
 
@@ -144,7 +144,7 @@ public class SendEmailTests
             UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
         };
 
-        var result = SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
+        var result = Smtp.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
         Assert.IsTrue(result.EmailSent);
     }
 
@@ -181,7 +181,7 @@ public class SendEmailTests
             UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
         };
 
-        var result = SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
+        var result = Smtp.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
         Assert.IsFalse(result.EmailSent);
     }
 
@@ -218,6 +218,6 @@ public class SendEmailTests
             UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
         };
 
-        Assert.Throws<FileNotFoundException>(() => SMTP.SendEmail(input, attachment, _options, new System.Threading.CancellationToken()));
+        Assert.Throws<FileNotFoundException>(() => Smtp.SendEmail(input, attachment, _options, new System.Threading.CancellationToken()));
     }
 }
