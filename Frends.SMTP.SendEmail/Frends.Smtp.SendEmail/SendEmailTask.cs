@@ -6,14 +6,14 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
-using Frends.Smtp.SendEmail.Definitions;
+using Frends.SMTP.SendEmail.Definitions;
 
-namespace Frends.Smtp.SendEmail;
+namespace Frends.SMTP.SendEmail;
 
 /// <summary>
 /// SMTP Task.
 /// </summary>
-public class Smtp
+public class SMTP
 {
     /// <summary>
     /// Frends Task for sending emails with optional attachments using SMTP protocol.

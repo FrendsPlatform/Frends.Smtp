@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Frends.Smtp.SendEmail.Definitions;
+namespace Frends.SMTP.SendEmail.Definitions;
 
 /// <summary>
 /// Input parameters.

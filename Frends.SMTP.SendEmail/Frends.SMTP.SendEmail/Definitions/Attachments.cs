@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frends.Smtp.SendEmail.Definitions;
+namespace Frends.SMTP.SendEmail.Definitions;
 
 /// <summary>
 /// Attachment parameters.

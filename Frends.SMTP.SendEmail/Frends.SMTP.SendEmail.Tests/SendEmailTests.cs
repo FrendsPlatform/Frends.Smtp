@@ -1,8 +1,8 @@
-using Frends.Smtp.SendEmail.Definitions;
+using Frends.SMTP.SendEmail.Definitions;
 using NUnit.Framework;
 using System.IO;
 
-namespace Frends.Smtp.SendEmail.Tests;
+namespace Frends.SMTP.SendEmail.Tests;
 
 /// <summary>
 /// NOTE: To run these unit tests, you need an SMTP test server.
@@ -28,6 +28,9 @@ public class SendEmailTests
     private string _filepath;
     private const bool USEWINDOWSAUTHENTICATION = false;
 
+    private Input _input;
+    private Options _options;
+
     [SetUp]
     public void EmailTestSetup()
     {
@@ -47,7 +50,7 @@ public class SendEmailTests
     [Test]
     public void SendEmailWithPlainText()
     {
-        var input = new Input()
+        _input = new Input()
         {
             From = FROMEMAILADDRESS,
             To = TOEMAILADDRESS,
@@ -60,7 +63,7 @@ public class SendEmailTests
             Subject = "Email test - PlainText"
         };
 
-        var _options = new Options()
+        _options = new Options()
         {
             UserName = USERNAME,
             Password = PASSWORD,
@@ -70,14 +73,14 @@ public class SendEmailTests
             UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
         };
 
-        var result = Smtp.SendEmail(input, null, _options, default);
+        var result = SMTP.SendEmail(_input, null, _options, default);
         Assert.IsTrue(result.EmailSent);
     }
 
     [Test]
     public void SendEmailWithFileAttachment()
     {
-        var input = new Input()
+        _input = new Input()
         {
             From = FROMEMAILADDRESS,
             To = TOEMAILADDRESS,
@@ -90,7 +93,7 @@ public class SendEmailTests
             Subject = "Email test - FileAttachment",
         };
 
-        var _options = new Options()
+        _options = new Options()
         {
             UserName = USERNAME,
             Password = PASSWORD,
@@ -108,14 +111,14 @@ public class SendEmailTests
             StringAttachment = null
         };
 
-        var result = Frends.Smtp.SendEmail(input, attachment, _options, default);
+        var result = SMTP.SendEmail(_input, attachment, _options, default);
         Assert.IsTrue(result.EmailSent);
     }
 
     [Test]
     public void SendEmailWithStringAttachment()
     {
-        var input = new Input()
+        _input = new Input()
         {
             From = FROMEMAILADDRESS,
             To = TOEMAILADDRESS,
@@ -144,14 +147,14 @@ public class SendEmailTests
             UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
         };
 
-        var result = Smtp.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
+        var result = SMTP.SendEmail(_input, attachment, _options, new System.Threading.CancellationToken());
         Assert.IsTrue(result.EmailSent);
     }
 
     [Test]
     public void TrySendingEmailWithNoFileAttachmentFound()
     {
-        var input = new Input()
+        _input = new Input()
         {
             From = FROMEMAILADDRESS,
             To = TOEMAILADDRESS,
@@ -171,7 +174,7 @@ public class SendEmailTests
             ThrowExceptionIfAttachmentNotFound = false
         };
 
-        var _options = new Options()
+        _options = new Options()
         {
             UserName = USERNAME,
             Password = PASSWORD,
@@ -181,14 +184,14 @@ public class SendEmailTests
             UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
         };
 
-        var result = Smtp.SendEmail(input, attachment, _options, new System.Threading.CancellationToken());
+        var result = SMTP.SendEmail(_input, attachment, _options, new System.Threading.CancellationToken());
         Assert.IsFalse(result.EmailSent);
     }
 
     [Test]
     public void TrySendingEmailWithNoFileAttachmentFoundException()
     {
-        var input = new Input()
+        _input = new Input()
         {
             From = FROMEMAILADDRESS,
             To = TOEMAILADDRESS,
@@ -208,7 +211,7 @@ public class SendEmailTests
             ThrowExceptionIfAttachmentNotFound = true
         };
 
-        var _options = new Options()
+        _options = new Options()
         {
             UserName = USERNAME,
             Password = PASSWORD,
@@ -218,6 +221,6 @@ public class SendEmailTests
             UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
         };
 
-        Assert.Throws<FileNotFoundException>(() => Smtp.SendEmail(input, attachment, _options, new System.Threading.CancellationToken()));
+        Assert.Throws<FileNotFoundException>(() => SMTP.SendEmail(_input, attachment, _options, new System.Threading.CancellationToken()));
     }
 }
