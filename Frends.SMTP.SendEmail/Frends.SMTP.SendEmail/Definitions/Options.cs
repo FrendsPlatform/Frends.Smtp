@@ -46,7 +46,7 @@ public class Options
     /// Use this password to log in to the SMTP server
     /// </summary>
     /// <example>Bar</example>
-    [PasswordPropertyText(true)]
+    [PasswordPropertyText]
     [UIHint(nameof(UseWindowsAuthentication), "", false)]
     public string Password { get; set; }
 }
