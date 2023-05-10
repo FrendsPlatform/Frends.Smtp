@@ -6,146 +6,153 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
-
 namespace Frends.SMTP.SendEmail
 {
-    public static class SMTP
-    {
-        /// <summary>
-        /// Sends email message with optional attachments.
-        /// [Documentation](https://github.com/FrendsPlatform/Frends.SMTP/tree/main/Frends.SMTP.SendEmail)
-        /// </summary>
-        /// <returns>
-        /// Object { bool EmailSent, string StatusString }
-        /// </returns>
-        public static Output SendEmail([PropertyTab] Input message, [PropertyTab] Attachment[] attachments, [PropertyTab] Options SMTPSettings, CancellationToken cancellationToken)
-        {
-            var output = new Output();
+#pragma warning disable S101 // Types should be named in PascalCase
+	public static class SMTP
+#pragma warning restore S101 // Types should be named in PascalCase
 
-            using (var client = InitializeSmtpClient(SMTPSettings))
-            {
-                using (var mail = InitializeMailMessage(message))
-                {
-                    if (attachments != null)
-                        foreach (var attachment in attachments)
-                        {
-                            if (attachment.AttachmentType == AttachmentType.FileAttachment)
-                            {
-                                ICollection<string> allAttachmentFilePaths = GetAttachmentFiles(attachment.FilePath);
+	{
+		/// <summary>
+		/// Sends email message with optional attachments.
+		/// [Documentation](https://github.com/FrendsPlatform/Frends.SMTP/tree/main/Frends.SMTP.SendEmail)
+		/// </summary>
+		/// <returns>
+		/// Object { bool EmailSent, string StatusString }
+		/// </returns>
+		public static Output SendEmail([PropertyTab] Input message, [PropertyTab] Attachment[] attachments, [PropertyTab] Options SMTPSettings, CancellationToken cancellationToken)
+		{
+			var output = new Output();
 
-                                if (attachment.ThrowExceptionIfAttachmentNotFound && allAttachmentFilePaths.Count == 0)
-                                    throw new FileNotFoundException(string.Format("The given filepath \"{0}\" had no matching files", attachment.FilePath), attachment.FilePath);
+			using (var client = InitializeSmtpClient(SMTPSettings))
+			{
+				using (var mail = InitializeMailMessage(message))
+				{
+					if (attachments != null)
+						foreach (var attachment in attachments)
+						{
+							if (attachment.AttachmentType == AttachmentType.FileAttachment)
+							{
+								ICollection<string> allAttachmentFilePaths = GetAttachmentFiles(attachment.FilePath);
 
-                                if (allAttachmentFilePaths.Count == 0 && !attachment.SendIfNoAttachmentsFound)
-                                {
-                                    output.StatusString = string.Format("No attachments found matching path \"{0}\". No email sent.", attachment.FilePath);
-                                    output.EmailSent = false;
-                                    return output;
-                                }
+								if (attachment.ThrowExceptionIfAttachmentNotFound && allAttachmentFilePaths.Count == 0)
+									throw new FileNotFoundException(string.Format("The given filepath \"{0}\" had no matching files", attachment.FilePath), attachment.FilePath);
 
-                                foreach (var fp in allAttachmentFilePaths)
-                                {
-                                    mail.Attachments.Add(new System.Net.Mail.Attachment(fp));
-                                }
-                            }
+								if (allAttachmentFilePaths.Count == 0 && !attachment.SendIfNoAttachmentsFound)
+								{
+									output.StatusString = string.Format("No attachments found matching path \"{0}\". No email sent.", attachment.FilePath);
+									output.EmailSent = false;
+									return output;
+								}
 
-                            if (attachment.AttachmentType == AttachmentType.AttachmentFromString)
-                            {
-                                //Create attachment only if content is not empty
-                                if (!string.IsNullOrEmpty(attachment.stringAttachment.FileContent))
-                                    mail.Attachments.Add(System.Net.Mail.Attachment.CreateAttachmentFromString(attachment.stringAttachment.FileContent, attachment.stringAttachment.FileName));
-                            }
+								foreach (var fp in allAttachmentFilePaths)
+								{
+									mail.Attachments.Add(new System.Net.Mail.Attachment(fp));
+								}
+							}
 
-                        }
+							if (attachment.AttachmentType == AttachmentType.AttachmentFromString
+								&& !string.IsNullOrEmpty(attachment.stringAttachment.FileContent))
+							{
+								mail.Attachments.Add(System.Net.Mail.Attachment.CreateAttachmentFromString
+									(attachment.stringAttachment.FileContent, attachment.stringAttachment.FileName));
+							}
 
-                    cancellationToken.ThrowIfCancellationRequested();
+						}
 
-                    client.Send(mail);
+					cancellationToken.ThrowIfCancellationRequested();
 
-                    output.EmailSent = true;
-                    output.StatusString = string.Format("Email sent to: {0}", mail.To.ToString());
+					client.Send(mail);
 
-                    return output;
-                }
-            }
-        }
+					output.EmailSent = true;
+					output.StatusString = string.Format("Email sent to: {0}", mail.To.ToString());
 
-        /// <summary>
-        /// Initializes new SmtpClient with given parameters.
-        /// </summary>
-        private static SmtpClient InitializeSmtpClient(Options settings)
-        {
-            var smtpClient = new SmtpClient
-            {
-                Port = settings.Port,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = settings.UseWindowsAuthentication,
-                EnableSsl = settings.UseSsl,
-                Host = settings.SMTPServer
-            };
+					return output;
+				}
+			}
+		}
 
-            if (!settings.UseWindowsAuthentication && !string.IsNullOrEmpty(settings.UserName))
-                smtpClient.Credentials = new NetworkCredential(settings.UserName, settings.Password);
+		/// <summary>
+		/// Initializes new SmtpClient with given parameters.
+		/// </summary>
+		private static SmtpClient InitializeSmtpClient(Options settings)
+		{
+			var smtpClient = new SmtpClient
+			{
+				Port = settings.Port,
+				DeliveryMethod = SmtpDeliveryMethod.Network,
+				UseDefaultCredentials = settings.UseWindowsAuthentication,
+				EnableSsl = settings.UseSsl,
+				Host = settings.SMTPServer
+			};
 
-            return smtpClient;
-        }
+			if (!settings.UseWindowsAuthentication && !string.IsNullOrEmpty(settings.UserName))
+				smtpClient.Credentials = new NetworkCredential(settings.UserName, settings.Password);
 
-        /// <summary>
-        /// Initializes new MailMessage with given parameters. Uses default value 'true' for IsBodyHtml
-        /// </summary>
-        private static MailMessage InitializeMailMessage(Input input)
-        {
-            //split recipients, either by comma or semicolon
-            var separators = new[] { ',', ';' };
+			return smtpClient;
+		}
 
-            string[] recipients = input.To.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-            string[] ccRecipients = input.Cc.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-            string[] bccRecipients = input.Bcc.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+		/// <summary>
+		/// Initializes new MailMessage with given parameters. Uses default value 'true' for IsBodyHtml
+		/// </summary>
+		private static MailMessage InitializeMailMessage(Input input)
+		{
+			//split recipients, either by comma or semicolon
+			var separators = new[] { ',', ';' };
 
-            //Create mail object
-            var mail = new MailMessage()
-            {
-                From = new MailAddress(input.From, input.SenderName),
-                Subject = input.Subject,
-                Body = input.Message,
-                IsBodyHtml = input.IsMessageHtml
-            };
-            //Add recipients
-            foreach (var recipientAddress in recipients)
-            {
-                mail.To.Add(recipientAddress);
-            }
-            //Add CC recipients
-            foreach (var ccRecipient in ccRecipients)
-            {
-                mail.CC.Add(ccRecipient);
-            }
-            //Add BCC recipients
-            foreach (var bccRecipient in bccRecipients)
-            {
-                mail.Bcc.Add(bccRecipient);
-            }
+			string[] recipients = string.IsNullOrEmpty(input.To)
+				? new string[] { }
+				: input.To.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+			string[] ccRecipients = string.IsNullOrEmpty(input.Cc)
+				? new string[] { }
+				: input.Cc.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+			string[] bccRecipients = string.IsNullOrEmpty(input.Bcc)
+				? new string[] { }
+				: input.Bcc.Split(separators, StringSplitOptions.RemoveEmptyEntries);
 
-            //Set message encoding
-            Encoding encoding = Encoding.GetEncoding(input.MessageEncoding);
+			//Create mail object
+			var mail = new MailMessage()
+			{
+				From = new MailAddress(input.From, input.SenderName),
+				Subject = input.Subject,
+				Body = input.Message,
+				IsBodyHtml = input.IsMessageHtml
+			};
+			//Add recipients
+			foreach (var recipientAddress in recipients)
+			{
+				mail.To.Add(recipientAddress);
+			}
+			//Add CC recipients
+			foreach (var ccRecipient in ccRecipients)
+			{
+				mail.CC.Add(ccRecipient);
+			}
+			//Add BCC recipients
+			foreach (var bccRecipient in bccRecipients)
+			{
+				mail.Bcc.Add(bccRecipient);
+			}
+			//Set message encoding
+			Encoding encoding = Encoding.GetEncoding(input.MessageEncoding);
 
-            mail.BodyEncoding = encoding;
-            mail.SubjectEncoding = encoding;
+			mail.BodyEncoding = encoding;
+			mail.SubjectEncoding = encoding;
 
-            return mail;
-        }
+			return mail;
+		}
 
-        /// <summary>
-        /// Gets all actual file names of attachments matching given file path
-        /// </summary>
-        private static ICollection<string> GetAttachmentFiles(string filePath)
-        {
-            string folder = Path.GetDirectoryName(filePath);
-            string fileMask = Path.GetFileName(filePath) != "" ? Path.GetFileName(filePath) : "*";
+		/// <summary>
+		/// Gets all actual file names of attachments matching given file path
+		/// </summary>
+		private static ICollection<string> GetAttachmentFiles(string filePath)
+		{
+			string folder = Path.GetDirectoryName(filePath);
+			string fileMask = Path.GetFileName(filePath) != "" ? Path.GetFileName(filePath) : "*";
 
-            string[] filePaths = Directory.GetFiles(folder, fileMask);
+			string[] filePaths = Directory.GetFiles(folder, fileMask);
 
-            return filePaths;
-        }
-    }
+			return filePaths;
+		}
+	}
 }
