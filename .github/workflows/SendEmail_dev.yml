@@ -8,7 +8,7 @@ on:
       - 'Frends.SMTP.SendEmail/**'
       - 'Frends.SMTP.SendEmail.Tests/**'
   workflow_dispatch:
-  
+  pull_request:
 
 jobs:
   build:
