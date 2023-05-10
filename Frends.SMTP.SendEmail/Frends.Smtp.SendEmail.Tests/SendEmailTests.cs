@@ -29,6 +29,7 @@ namespace Frends.SMTP.SendEmail.Tests
         private string _localAttachmentFolder;
         private string _filepath;
         private Input _input;
+        private Input _input2;
         private Options _options;
 
         [SetUp]
@@ -42,7 +43,9 @@ namespace Frends.SMTP.SendEmail.Tests
             _filepath = Path.Combine(_localAttachmentFolder, TEST_FILE_NAME);
 
             if (!File.Exists(_filepath))
-                using (File.Create(_filepath)) { }
+            {
+                File.Create(_filepath).Dispose();
+            }
 
             _input = new Input()
             {
@@ -50,6 +53,18 @@ namespace Frends.SMTP.SendEmail.Tests
                 To = TOEMAILADDRESS,
                 Cc = "",
                 Bcc = "",
+                Message = "testmsg",
+                IsMessageHtml = false,
+                SenderName = "EmailTestSender",
+                MessageEncoding = "utf-8"
+            };
+
+            _input2 = new Input()
+            {
+                From = FROMEMAILADDRESS,
+                To = TOEMAILADDRESS,
+                Cc = null,
+                Bcc = null,
                 Message = "testmsg",
                 IsMessageHtml = false,
                 SenderName = "EmailTestSender",
@@ -111,7 +126,7 @@ namespace Frends.SMTP.SendEmail.Tests
         {
             var input = _input;
             input.Subject = "Email test - AttachmentFromString";
-            var fileAttachment = new AttachmentFromString() { FileContent = "teststring ä ö", FileName = "testfilefromstring.txt" };
+            var fileAttachment = new AttachmentFromString() { FileContent = "teststring ï¿½ ï¿½", FileName = "testfilefromstring.txt" };
             var attachment = new Attachment()
             {
                 AttachmentType = AttachmentType.AttachmentFromString,
@@ -127,6 +142,26 @@ namespace Frends.SMTP.SendEmail.Tests
         public void TrySendingEmailWithNoFileAttachmentFound()
         {
             var input = _input;
+            input.Subject = "Email test";
+
+            var attachment = new Attachment
+            {
+                FilePath = Path.Combine(_localAttachmentFolder, TEST_FILE_NOT_EXISTING),
+                SendIfNoAttachmentsFound = false,
+                ThrowExceptionIfAttachmentNotFound = false
+            };
+
+
+            var Attachments = new Attachment[] { attachment };
+
+            var result = SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
+            Assert.IsFalse(result.EmailSent);
+        }
+
+        [Test]
+        public void TrySendingEmailWithNoCcAndBcc()
+        {
+            var input = _input2;
             input.Subject = "Email test";
 
             var attachment = new Attachment
