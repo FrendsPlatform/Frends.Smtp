@@ -2,10 +2,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
-	<Version>1.0.0</Version>
-	<Authors>HiQ Finland</Authors>
-	<Company>HiQ Finland</Company>
+  <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+	<Version>1.0.1</Version>
+	<Authors>Frends</Authors>
+	<Company>Frends</Company>
 	<Product>Frends</Product>
 	<Description>Task for sending emails using SMTP protocol.</Description>
 	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
