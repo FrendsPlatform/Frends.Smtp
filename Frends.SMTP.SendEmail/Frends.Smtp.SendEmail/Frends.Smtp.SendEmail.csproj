@@ -3,7 +3,7 @@
 
   <PropertyGroup>
   <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
-	<Version>1.0.1</Version>
+	<Version>1.0.2</Version>
 	<Authors>Frends</Authors>
 	<Company>Frends</Company>
 	<Product>Frends</Product>
@@ -17,6 +17,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

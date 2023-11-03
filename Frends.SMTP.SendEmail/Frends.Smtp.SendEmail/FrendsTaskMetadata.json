@@ -1,0 +1,5 @@
+{
+  "Tasks": [
+    { "TaskMethod": "Frends.SMTP.SendEmail.SMTP.SendEmail" }
+  ]
+}
