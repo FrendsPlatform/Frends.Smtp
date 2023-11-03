@@ -1,4 +1,6 @@
 # Changelog
+## [1.0.3] - 2023-11-03
+- Fix missing XML comments.
 
 ## [1.0.2] - 2023-11-03
 - Fix bug #20 - Missing Frends tasks metadata file
