@@ -6,31 +6,35 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
+using Frends.SMTP.SendEmail.Definitions;
+
 namespace Frends.SMTP.SendEmail
 {
-#pragma warning disable S101 // Types should be named in PascalCase
+    /// <summary>
+    /// Main class of the Task.
+    /// </summary>
     public static class SMTP
-#pragma warning restore S101 // Types should be named in PascalCase
-
     {
         /// <summary>
         /// Sends email message with optional attachments.
-        /// [Documentation](https://github.com/FrendsPlatform/Frends.SMTP/tree/main/Frends.SMTP.SendEmail)
+        /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.SMTP.SendEmail)
         /// </summary>
-        /// <returns>
-        /// Object { bool EmailSent, string StatusString }
-        /// </returns>
-        public static Output SendEmail([PropertyTab] Input message, [PropertyTab] Attachment[] attachments, [PropertyTab] Options SMTPSettings, CancellationToken cancellationToken)
+        /// <param name="message">Message parameters.</param>
+        /// <param name="attachments">Parameters for adding attachments.</param>
+        /// <param name="SMTPSettings">Connection parameters.</param>
+        /// <param name="cancellationToken">Token given by Frends to terminate the Task.</param>
+        /// <returns>Object { bool EmailSent, string StatusString }</returns>
+        public static Result SendEmail([PropertyTab] Input message, [PropertyTab] AttachmentOptions attachments, [PropertyTab] Options SMTPSettings, CancellationToken cancellationToken)
         {
-            var output = new Output();
-
             using (var client = InitializeSmtpClient(SMTPSettings))
             {
-                using (var mail = InitializeMailMessage(message))
+                using (var mail = InitializeMailMessage(message, cancellationToken))
                 {
                     if (attachments != null)
-                        foreach (var attachment in attachments)
+                        foreach (var attachment in attachments.Attachments)
                         {
+                            cancellationToken.ThrowIfCancellationRequested();
+
                             if (attachment.AttachmentType == AttachmentType.FileAttachment)
                             {
                                 ICollection<string> allAttachmentFilePaths = GetAttachmentFiles(attachment.FilePath);
@@ -39,37 +43,26 @@ namespace Frends.SMTP.SendEmail
                                     throw new FileNotFoundException(string.Format("The given filepath \"{0}\" had no matching files", attachment.FilePath), attachment.FilePath);
 
                                 if (allAttachmentFilePaths.Count == 0 && !attachment.SendIfNoAttachmentsFound)
-                                {
-                                    output.StatusString = string.Format("No attachments found matching path \"{0}\". No email sent.", attachment.FilePath);
-                                    output.EmailSent = false;
-                                    return output;
-                                }
+                                    return new Result(false, $"No attachments found matching path \"{attachment.FilePath}\". No email sent.");
 
                                 foreach (var fp in allAttachmentFilePaths)
                                 {
+                                    cancellationToken.ThrowIfCancellationRequested();
                                     mail.Attachments.Add(new System.Net.Mail.Attachment(fp));
                                 }
                             }
 
                             if (attachment.AttachmentType == AttachmentType.AttachmentFromString
                                 && !string.IsNullOrEmpty(attachment.stringAttachment.FileContent))
-                            {
                                 mail.Attachments.Add(System.Net.Mail.Attachment.CreateAttachmentFromString
                                     (attachment.stringAttachment.FileContent, attachment.stringAttachment.FileName));
-                            }
-
                         }
-
-                    cancellationToken.ThrowIfCancellationRequested();
 
                     client.Send(mail);
 
-                    output.EmailSent = true;
-                    output.StatusString = string.Format("Email sent to: {0}", mail.To.ToString());
-
-                    return output;
+                    return new Result(true, $"Email sent to: {mail.To}");
                 }
-            }
+            }        
         }
 
         /// <summary>
@@ -95,7 +88,7 @@ namespace Frends.SMTP.SendEmail
         /// <summary>
         /// Initializes new MailMessage with given parameters. Uses default value 'true' for IsBodyHtml
         /// </summary>
-        private static MailMessage InitializeMailMessage(Input input)
+        private static MailMessage InitializeMailMessage(Input input, CancellationToken cancellationToken)
         {
             //split recipients, either by comma or semicolon
             var separators = new[] { ',', ';' };
@@ -121,16 +114,19 @@ namespace Frends.SMTP.SendEmail
             //Add recipients
             foreach (var recipientAddress in recipients)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 mail.To.Add(recipientAddress);
             }
             //Add CC recipients
             foreach (var ccRecipient in ccRecipients)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 mail.CC.Add(ccRecipient);
             }
             //Add BCC recipients
             foreach (var bccRecipient in bccRecipients)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 mail.Bcc.Add(bccRecipient);
             }
             //Set message encoding

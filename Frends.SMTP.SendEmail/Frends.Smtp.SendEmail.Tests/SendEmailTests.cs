@@ -1,21 +1,19 @@
 using NUnit.Framework;
 using System;
 using System.IO;
+using Frends.SMTP.SendEmail.Definitions;
 
 namespace Frends.SMTP.SendEmail.Tests
 {
-    /// <summary>
-    /// NOTE: To run these unit tests, you need an SMTP test server. Fill in the properties below with your values.
-    /// </summary>
     [TestFixture]
     public class SendEmailTests
     {
         // ****************************************** FILL THESE ******************************************************
-        private const string USERNAME = "apikey";
-        private const string PASSWORD = "";
-        private const string SMTPADDRESS = "smtp.sendgrid.net";
-        private const string TOEMAILADDRESS = "jefim.borissov@hiq.fi";
-        private const string FROMEMAILADDRESS = "jefim.borissov@hiq.fi";
+        private static readonly string USERNAME = "apikey"; // Environment.GetEnvironmentVariable("Frends_SMTP_Username");
+        private static readonly string PASSWORD = Environment.GetEnvironmentVariable("SMTP_PASSWORD"); // Environment.GetEnvironmentVariable("Frends_SMTP_Password");
+        private static readonly string SMTPADDRESS = "smtp.sendgrid.net"; // Environment.GetEnvironmentVariable("Frends_SMTP_Address");
+        private static readonly string TOEMAILADDRESS = "jefim.borissov@hiq.fi"; // Environment.GetEnvironmentVariable("Frends_SMTP_Email");
+        private static readonly string FROMEMAILADDRESS = "jefim.borissov@hiq.fi"; // Environment.GetEnvironmentVariable("Frends_SMTP_Email");
         private const int PORT = 587;
         private const bool USESSL = true;
         private const bool USEWINDOWSAUTHENTICATION = false;
@@ -71,12 +69,10 @@ namespace Frends.SMTP.SendEmail.Tests
                 MessageEncoding = "utf-8"
             };
 
-            var passwordFromEnvironment = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
-
             _options = new Options()
             {
                 UserName = USERNAME,
-                Password = string.IsNullOrWhiteSpace(passwordFromEnvironment) ? PASSWORD : passwordFromEnvironment,
+                Password = PASSWORD,
                 SMTPServer = SMTPADDRESS,
                 Port = PORT,
                 UseSsl = USESSL,
@@ -97,7 +93,7 @@ namespace Frends.SMTP.SendEmail.Tests
             var input = _input;
             input.Subject = "Email test - PlainText";
 
-            var result = SMTP.SendEmail(input, null, _options, new System.Threading.CancellationToken());
+            var result = SMTP.SendEmail(input, null, _options, default);
             Assert.IsTrue(result.EmailSent);
         }
 
@@ -109,15 +105,16 @@ namespace Frends.SMTP.SendEmail.Tests
 
             var attachment = new Attachment
             {
+                AttachmentType = AttachmentType.FileAttachment,
                 FilePath = _filepath,
                 SendIfNoAttachmentsFound = false,
                 ThrowExceptionIfAttachmentNotFound = true
             };
 
 
-            var Attachments = new Attachment[] { attachment };
+            var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-            var result = SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
+            var result = SMTP.SendEmail(input, Attachments, _options, default);
             Assert.IsTrue(result.EmailSent);
         }
 
@@ -132,9 +129,9 @@ namespace Frends.SMTP.SendEmail.Tests
                 AttachmentType = AttachmentType.AttachmentFromString,
                 stringAttachment = fileAttachment
             };
-            var Attachments = new Attachment[] { attachment };
+            var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-            var result = SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
+            var result = SMTP.SendEmail(input, Attachments, _options, default);
             Assert.IsTrue(result.EmailSent);
         }
 
@@ -152,9 +149,9 @@ namespace Frends.SMTP.SendEmail.Tests
             };
 
 
-            var Attachments = new Attachment[] { attachment };
+            var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-            var result = SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
+            var result = SMTP.SendEmail(input, Attachments, _options, default);
             Assert.IsFalse(result.EmailSent);
         }
 
@@ -172,9 +169,9 @@ namespace Frends.SMTP.SendEmail.Tests
             };
 
 
-            var Attachments = new Attachment[] { attachment };
+            var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-            var result = SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken());
+            var result = SMTP.SendEmail(input, Attachments, _options, default);
             Assert.IsFalse(result.EmailSent);
         }
 
@@ -192,9 +189,9 @@ namespace Frends.SMTP.SendEmail.Tests
             };
 
 
-            var Attachments = new Attachment[] { attachment };
+            var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-            Assert.Throws<FileNotFoundException>(() => SMTP.SendEmail(input, Attachments, _options, new System.Threading.CancellationToken()));
+            Assert.Throws<FileNotFoundException>(() => SMTP.SendEmail(input, Attachments, _options, default));
 
         }
     }
