@@ -1,18 +1,18 @@
-﻿namespace Frends.SMTP.SendEmail.Definitions
+﻿namespace Frends.SMTP.SendEmail.Definitions;
+
+/// <summary>
+/// Enumeration for Attachment type.
+/// </summary>
+public enum AttachmentType
 {
     /// <summary>
-    /// Enumeration for Attachment type.
+    /// Select this if the attachment is a file.
     /// </summary>
-    public enum AttachmentType
-    {
-        /// <summary>
-        /// Select this if the attachment is a file.
-        /// </summary>
-        FileAttachment,
+    FileAttachment,
 
-        /// <summary>
-        /// Select this if the attachment file should be created from a string.
-        /// </summary>
-        AttachmentFromString
-    }
+    /// <summary>
+    /// Select this if the attachment file should be created from a string.
+    /// </summary>
+    AttachmentFromString
 }
+
