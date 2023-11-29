@@ -1,8 +1,7 @@
-name: Frends.SMTP.SendEmail Release
+name: SendEmail_release
 
 on:
-  workflow_dispatch:
-  
+  workflow_dispatch: 
 
 jobs:
   build:
