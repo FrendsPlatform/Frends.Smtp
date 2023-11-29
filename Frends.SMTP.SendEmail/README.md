@@ -3,8 +3,8 @@ Frends task for sending emails with SMTP. Task sends emails via SMTP protocol an
 
 
 [![Frends.Smtp.SendEmail Main](https://github.com/FrendsPlatform/Frends.SMTP/actions/workflows/SendEmail_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.SMTP/actions)
- ![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SMTP?label=License)
- ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SMTP/Frends.SMTP.SendEmail|main)
+![GitHub](https://img.shields.io/github/license/FrendsPlatform/Frends.SMTP?label=License)
+![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.SMTP/Frends.SMTP.SendEmail|main)
 
 ## Installing
 
