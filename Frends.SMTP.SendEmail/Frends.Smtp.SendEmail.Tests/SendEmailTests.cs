@@ -9,11 +9,11 @@ namespace Frends.SMTP.SendEmail.Tests
     public class SendEmailTests
     {
         // ****************************************** FILL THESE ******************************************************
-        private static readonly string USERNAME = "apikey"; // Environment.GetEnvironmentVariable("Frends_SMTP_Username");
-        private static readonly string PASSWORD = Environment.GetEnvironmentVariable("SMTP_PASSWORD"); // Environment.GetEnvironmentVariable("Frends_SMTP_Password");
-        private static readonly string SMTPADDRESS = "smtp.sendgrid.net"; // Environment.GetEnvironmentVariable("Frends_SMTP_Address");
-        private static readonly string TOEMAILADDRESS = "jefim.borissov@hiq.fi"; // Environment.GetEnvironmentVariable("Frends_SMTP_Email");
-        private static readonly string FROMEMAILADDRESS = "jefim.borissov@hiq.fi"; // Environment.GetEnvironmentVariable("Frends_SMTP_Email");
+        private static readonly string USERNAME = Environment.GetEnvironmentVariable("Frends_SMTP_Username");
+        private static readonly string PASSWORD = Environment.GetEnvironmentVariable("Frends_SMTP_Password");
+        private static readonly string SMTPADDRESS = Environment.GetEnvironmentVariable("Frends_SMTP_Address");
+        private static readonly string TOEMAILADDRESS = Environment.GetEnvironmentVariable("Frends_SMTP_Email");
+        private static readonly string FROMEMAILADDRESS = Environment.GetEnvironmentVariable("Frends_SMTP_Email");
         private const int PORT = 587;
         private const bool USESSL = true;
         private const bool USEWINDOWSAUTHENTICATION = false;
@@ -127,11 +127,12 @@ namespace Frends.SMTP.SendEmail.Tests
             var attachment = new Attachment()
             {
                 AttachmentType = AttachmentType.AttachmentFromString,
-                stringAttachment = fileAttachment
+                StringAttachment = fileAttachment
             };
             var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
             var result = SMTP.SendEmail(input, Attachments, _options, default);
+            Console.WriteLine(result.StatusString);
             Assert.IsTrue(result.EmailSent);
         }
 

@@ -26,43 +26,39 @@ namespace Frends.SMTP.SendEmail
         /// <returns>Object { bool EmailSent, string StatusString }</returns>
         public static Result SendEmail([PropertyTab] Input message, [PropertyTab] AttachmentOptions attachments, [PropertyTab] Options SMTPSettings, CancellationToken cancellationToken)
         {
-            using (var client = InitializeSmtpClient(SMTPSettings))
-            {
-                using (var mail = InitializeMailMessage(message, cancellationToken))
+            using var client = InitializeSmtpClient(SMTPSettings);
+            using var mail = InitializeMailMessage(message, cancellationToken);
+            if (attachments != null)
+                foreach (var attachment in attachments.Attachments)
                 {
-                    if (attachments != null)
-                        foreach (var attachment in attachments.Attachments)
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    if (attachment.AttachmentType == AttachmentType.FileAttachment)
+                    {
+                        ICollection<string> allAttachmentFilePaths = GetAttachmentFiles(attachment.FilePath);
+
+                        if (attachment.ThrowExceptionIfAttachmentNotFound && allAttachmentFilePaths.Count == 0)
+                            throw new FileNotFoundException($@"The given filepath ""attachment.FilePath"" had no matching files", attachment.FilePath);
+
+                        if (allAttachmentFilePaths.Count == 0 && !attachment.SendIfNoAttachmentsFound)
+                            return new Result(false, $@"No attachments found matching path ""{attachment.FilePath}"". No email sent.");
+
+                        foreach (var fp in allAttachmentFilePaths)
                         {
                             cancellationToken.ThrowIfCancellationRequested();
-
-                            if (attachment.AttachmentType == AttachmentType.FileAttachment)
-                            {
-                                ICollection<string> allAttachmentFilePaths = GetAttachmentFiles(attachment.FilePath);
-
-                                if (attachment.ThrowExceptionIfAttachmentNotFound && allAttachmentFilePaths.Count == 0)
-                                    throw new FileNotFoundException(string.Format("The given filepath \"{0}\" had no matching files", attachment.FilePath), attachment.FilePath);
-
-                                if (allAttachmentFilePaths.Count == 0 && !attachment.SendIfNoAttachmentsFound)
-                                    return new Result(false, $"No attachments found matching path \"{attachment.FilePath}\". No email sent.");
-
-                                foreach (var fp in allAttachmentFilePaths)
-                                {
-                                    cancellationToken.ThrowIfCancellationRequested();
-                                    mail.Attachments.Add(new System.Net.Mail.Attachment(fp));
-                                }
-                            }
-
-                            if (attachment.AttachmentType == AttachmentType.AttachmentFromString
-                                && !string.IsNullOrEmpty(attachment.stringAttachment.FileContent))
-                                mail.Attachments.Add(System.Net.Mail.Attachment.CreateAttachmentFromString
-                                    (attachment.stringAttachment.FileContent, attachment.stringAttachment.FileName));
+                            mail.Attachments.Add(new System.Net.Mail.Attachment(fp));
                         }
+                    }
 
-                    client.Send(mail);
-
-                    return new Result(true, $"Email sent to: {mail.To}");
+                    if (attachment.AttachmentType == AttachmentType.AttachmentFromString
+                        && !string.IsNullOrEmpty(attachment.StringAttachment.FileContent))
+                        mail.Attachments.Add(System.Net.Mail.Attachment.CreateAttachmentFromString
+                            (attachment.StringAttachment.FileContent, attachment.StringAttachment.FileName));
                 }
-            }        
+
+            client.Send(mail);
+
+            return new Result(true, $"Email sent to: {mail.To}");
         }
 
         /// <summary>
@@ -94,13 +90,13 @@ namespace Frends.SMTP.SendEmail
             var separators = new[] { ',', ';' };
 
             string[] recipients = string.IsNullOrEmpty(input.To)
-                ? new string[] { }
+                ? Array.Empty<string>()
                 : input.To.Split(separators, StringSplitOptions.RemoveEmptyEntries);
             string[] ccRecipients = string.IsNullOrEmpty(input.Cc)
-                ? new string[] { }
+                ? Array.Empty<string>()
                 : input.Cc.Split(separators, StringSplitOptions.RemoveEmptyEntries);
             string[] bccRecipients = string.IsNullOrEmpty(input.Bcc)
-                ? new string[] { }
+                ? Array.Empty<string>()
                 : input.Bcc.Split(separators, StringSplitOptions.RemoveEmptyEntries);
 
             //Create mail object

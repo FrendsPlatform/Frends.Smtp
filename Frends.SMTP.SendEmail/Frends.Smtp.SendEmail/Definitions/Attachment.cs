@@ -17,13 +17,13 @@ namespace Frends.SMTP.SendEmail.Definitions
         /// Attachment from string.
         /// </summary>
         [UIHint(nameof(AttachmentType), "", AttachmentType.AttachmentFromString)]
-        public AttachmentFromString stringAttachment { get; set; }
+        public AttachmentFromString StringAttachment { get; set; }
 
         /// <summary>
         /// Attachment file's path. Uses Directory.GetFiles(string, string) as a pattern matching technique. See https://msdn.microsoft.com/en-us/library/wz42302f(v=vs.110).aspx.
         /// Exception: If the path ends in a directory, all files in that folder are added as attachments.
         /// </summary>
-        [DefaultValue("\"\"")]
+        [DefaultValue("")]
         [UIHint(nameof(AttachmentType), "", AttachmentType.FileAttachment)]
         public string FilePath { get; set; }
 

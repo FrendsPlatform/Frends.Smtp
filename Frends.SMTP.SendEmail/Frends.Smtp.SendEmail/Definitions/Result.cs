@@ -20,7 +20,7 @@
         /// <summary>
         /// Contains information about the task's result.
         /// </summary>
-        /// <example></example>
+        /// <example>Email sent to: john.doe@somedomain.com</example>
         public string StatusString { get; private set; }
     }
 }

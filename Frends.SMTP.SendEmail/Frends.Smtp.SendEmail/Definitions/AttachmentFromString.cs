@@ -10,13 +10,13 @@ namespace Frends.SMTP.SendEmail.Definitions
         /// <summary>
         /// Content of the attachment file
         /// </summary>
-        [DefaultValue("\"\"")]
+        [DefaultValue("")]
         public string FileContent { get; set; }
 
         /// <summary>
         /// Name of the attachment file
         /// </summary>
-        [DefaultValue("\"\"")]
+        [DefaultValue("")]
         public string FileName { get; set; }
     }
 }

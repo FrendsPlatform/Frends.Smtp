@@ -2,7 +2,7 @@
 
 ## [1.1.0] - 2023-11-29
 ### Fixed
-- Fixed issue with the attachments can't be given as expression
+- [Breaking] Fixed issue with the attachments can't be given as expression by adding AttachmentOptions class.
 
 ## [1.0.3] - 2023-11-03
 ### Added

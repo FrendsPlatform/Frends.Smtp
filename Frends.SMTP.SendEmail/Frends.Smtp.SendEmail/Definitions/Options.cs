@@ -12,7 +12,7 @@ namespace Frends.SMTP.SendEmail.Definitions
         /// SMTP server address.
         /// </summary>
         /// <example>smtp.somedomain.com</example>
-        [DefaultValue("\"smtp.somedomain.com\"")]
+        [DefaultValue("smtp.somedomain.com")]
         public string SMTPServer { get; set; }
 
         /// <summary>
@@ -40,16 +40,16 @@ namespace Frends.SMTP.SendEmail.Definitions
         /// Use this username to log in to the SMTP server
         /// </summary>
         /// <example>testuser</example>
-        [DefaultValue("\"\"")]
+        [DefaultValue("")]
         [UIHint(nameof(UseWindowsAuthentication), "", false)]
         public string UserName { get; set; }
 
         /// <summary>
         /// Use this password to log in to the SMTP server
         /// </summary>
-        /// <example>testpassword</example>
+        /// <example>Password123</example>
         [PasswordPropertyText(true)]
-        [DefaultValue("\"\"")]
+        [DefaultValue("")]
         [UIHint(nameof(UseWindowsAuthentication), "", false)]
         public string Password { get; set; }
     }
