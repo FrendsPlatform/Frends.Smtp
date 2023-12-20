@@ -98,7 +98,15 @@ public static class SMTP
     /// </summary>
     private static async Task<bool> ConnectAndAuthenticate(SmtpClient client, Options settings, CancellationToken cancellationToken)
     {
-        await client.ConnectAsync(settings.SMTPServer, settings.Port, settings.UseSsl, cancellationToken);
+        var secureSocketOption = settings.SecureSocket switch
+        {
+            SecureSocketOption.None => SecureSocketOptions.None,
+            SecureSocketOption.SslOnConnect => SecureSocketOptions.SslOnConnect,
+            SecureSocketOption.StartTls => SecureSocketOptions.StartTls,
+            SecureSocketOption.StartTlsWhenAvailable => SecureSocketOptions.StartTlsWhenAvailable,
+            _ => SecureSocketOptions.Auto,
+        };
+        await client.ConnectAsync(settings.SMTPServer, settings.Port, secureSocketOption, cancellationToken);
 
         SaslMechanism mechanism;
 

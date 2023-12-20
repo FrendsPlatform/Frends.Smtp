@@ -16,7 +16,6 @@ public class SendEmailTests
     private static readonly string TOEMAILADDRESS = Environment.GetEnvironmentVariable("Frends_SMTP_Email");
     private static readonly string FROMEMAILADDRESS = Environment.GetEnvironmentVariable("Frends_SMTP_Email");
     private const int PORT = 587;
-    private const bool USESSL = true;
     // ************************************************************************************************************
 
 
@@ -75,7 +74,8 @@ public class SendEmailTests
             Password = PASSWORD,
             SMTPServer = SMTPADDRESS,
             Port = PORT,
-            UseSsl = USESSL,
+            UseOAuth2 = false,
+            SecureSocket = SecureSocketOption.None
         };
 
     }
@@ -191,7 +191,6 @@ public class SendEmailTests
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
         var ex = Assert.ThrowsAsync<FileNotFoundException>(async () => await SMTP.SendEmail(input, Attachments, _options, default));
-        Assert.AreEqual("", ex.Message);
-
+        Assert.AreEqual(@"The given filepath 'C:\Users\virtari\AppData\Local\Temp\emailtestattachments\doesntexist.txt' had no matching files", ex.Message);
     }
 }

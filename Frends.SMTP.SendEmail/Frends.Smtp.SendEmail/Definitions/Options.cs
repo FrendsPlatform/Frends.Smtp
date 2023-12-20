@@ -23,11 +23,11 @@ public class Options
     public int Port { get; set; }
 
     /// <summary>
-    /// Set this true if SMTP expects to be connected using SSL.
+    /// Choose the SecureSocketOption to use, default is Auto
     /// </summary>
-    /// <exmaple>true</exmaple>
-    [DefaultValue("false")]
-    public bool UseSsl { get; set; }
+    /// <example>SecureSocketOption.None</example>
+    [DefaultValue(SecureSocketOption.Auto)]
+    public SecureSocketOption SecureSocket { get; set; }
 
     /// <summary>
     /// Set this true if SMTP server expectes OAuth token.
