@@ -30,18 +30,27 @@ public class Options
     public bool UseSsl { get; set; }
 
     /// <summary>
-    /// Set this true if you want to use windows authentication to authenticate to SMTP server.
+    /// Set this true if SMTP server expectes OAuth token.
     /// </summary>
-    /// <example>false</example>
-    [DefaultValue("true")]
-    public bool UseWindowsAuthentication { get; set; }
+    /// <example>true</example>
+    [DefaultValue(false)]
+    public bool UseOAuth2 { get; set; }
+
+    /// <summary>
+    /// Token to be used when using OAuth2.
+    /// </summary>
+    /// <example>cec4ce4f98e4f68e4vc89v1489v4987s4erv8794...</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [UIHint(nameof(UseOAuth2), "", true)]
+    [PasswordPropertyText]
+    public string Token { get; set; }
 
     /// <summary>
     /// Use this username to log in to the SMTP server
     /// </summary>
     /// <example>testuser</example>
     [DefaultValue("")]
-    [UIHint(nameof(UseWindowsAuthentication), "", false)]
+    [UIHint(nameof(UseOAuth2), "", false)]
     public string UserName { get; set; }
 
     /// <summary>
@@ -50,6 +59,6 @@ public class Options
     /// <example>Password123</example>
     [PasswordPropertyText(true)]
     [DefaultValue("")]
-    [UIHint(nameof(UseWindowsAuthentication), "", false)]
+    [UIHint(nameof(UseOAuth2), "", false)]
     public string Password { get; set; }
 }
