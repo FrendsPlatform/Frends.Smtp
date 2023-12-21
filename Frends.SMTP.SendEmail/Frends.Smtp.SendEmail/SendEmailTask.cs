@@ -70,6 +70,8 @@ public static class SMTP
                     CleanUpTempWorkDir(path);
                 }
             }
+
+            mail.Body = builder.ToMessageBody();
         }
         else
         {
@@ -87,7 +89,7 @@ public static class SMTP
 
         await ConnectAndAuthenticate(client, SMTPSettings, cancellationToken);
 
-        client.Send(mail);
+        await client.SendAsync(mail, cancellationToken);
         await client.DisconnectAsync(true, cancellationToken);
 
         return new Result(true, $"Email sent to: {mail.To}");
@@ -113,7 +115,7 @@ public static class SMTP
         if (settings.UseOAuth2)
             mechanism = new SaslMechanismOAuth2(settings.UserName, settings.Token);
         else
-            mechanism = new SaslMechanismLogin(new NetworkCredential(settings.UserName, settings.Password)); 
+            mechanism = new SaslMechanismLogin(new NetworkCredential(settings.UserName, settings.Password));
 
         await client.AuthenticateAsync(mechanism, cancellationToken);
 
@@ -140,7 +142,8 @@ public static class SMTP
 
         //Create mail object
         var mail = new MimeMessage();
-        mail.From.Add(new MailboxAddress(input.From, input.SenderName));
+        mail.From.Add(new MailboxAddress(input.SenderName, input.From));
+        mail.Sender = new MailboxAddress(input.SenderName, input.From);
         mail.To.AddRange(recipients);
         mail.Cc.AddRange(ccRecipients);
         mail.Bcc.AddRange(bccRecipients);

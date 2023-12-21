@@ -12,6 +12,7 @@ public class Options
     /// SMTP server address.
     /// </summary>
     /// <example>smtp.somedomain.com</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("smtp.somedomain.com")]
     public string SMTPServer { get; set; }
 
@@ -49,8 +50,8 @@ public class Options
     /// Use this username to log in to the SMTP server
     /// </summary>
     /// <example>testuser</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("")]
-    [UIHint(nameof(UseOAuth2), "", false)]
     public string UserName { get; set; }
 
     /// <summary>

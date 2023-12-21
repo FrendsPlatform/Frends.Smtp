@@ -79,6 +79,7 @@ public class SendEmailTests
         };
 
     }
+
     [TearDown]
     public void EmailTestTearDown()
     {
@@ -191,6 +192,6 @@ public class SendEmailTests
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
         var ex = Assert.ThrowsAsync<FileNotFoundException>(async () => await SMTP.SendEmail(input, Attachments, _options, default));
-        Assert.AreEqual(@"The given filepath 'C:\Users\virtari\AppData\Local\Temp\emailtestattachments\doesntexist.txt' had no matching files", ex.Message);
+        Assert.AreEqual(@$"The given filepath '{attachment.FilePath}' had no matching files", ex.Message);
     }
 }

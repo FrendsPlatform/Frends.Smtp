@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.SMTP.SendEmail.Definitions;
 
@@ -11,6 +12,7 @@ public class Input
     /// Recipient addresses separated by ',' or ';'
     /// </summary>
     /// <example>jane.doe@somedomain.com</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("jane.doe@somedomain.com")]
     public string To { get; set; }
 
@@ -18,6 +20,7 @@ public class Input
     /// Cc recipient addresses separated by ',' or ';'
     /// </summary>
     /// <example>jane.doe@somedomain.com</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("jane.doe@somedomain.com")]
     public string Cc { get; set; }
 
@@ -25,6 +28,7 @@ public class Input
     /// Bcc recipient addresses separated by ',' or ';'
     /// </summary>
     /// <example>jane.doe@somedomain.com</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("jane.doe@somedomain.com")]
     public string Bcc { get; set; }
 
@@ -32,6 +36,7 @@ public class Input
     /// Sender address.
     /// </summary>
     /// <example>jane.doe@somedomain.com</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("john.doe@somedomain.com")]
     public string From { get; set; }
 
@@ -39,6 +44,7 @@ public class Input
     /// Name of the sender.
     /// </summary>
     /// <example>Jane Doe</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("")]
     public string SenderName { get; set; }
 
@@ -46,13 +52,15 @@ public class Input
     /// Email message's subject.
     /// </summary>
     /// <example>Hello Jane</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("Hello Jane")]
     public string Subject { get; set; }
 
     /// <summary>
     /// Body of the message.
     /// </summary>
-    /// <exmaple>You've got mail!</exmaple>
+    /// <example>You've got mail!</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("You've got mail!")]
     public string Message { get; set; }
 
@@ -67,6 +75,7 @@ public class Input
     /// Encoding of message body and subject. Use following table's name column for other options. https://msdn.microsoft.com/en-us/library/system.text.encoding(v=vs.110).aspx#Anchor_5 
     /// </summary>
     /// <example>utf-8</example>
+    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("utf-8")]
     public string MessageEncoding { get; set; }
 
