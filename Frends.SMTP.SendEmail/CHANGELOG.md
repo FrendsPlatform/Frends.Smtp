@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0] - 2023-12-21
+### Changed
+- Changed Task to use MailKit library instead of deprecated System.Net.Mail.
+- Changed the Task to create a temp file from the AttachmentFromString. The temp file will be removed afterwards.
+
+### Added
+- Added OAuth2 support.
+- New parameters:
+	- SecureSocket
+	- UseOAuth2
+	- Token
+
+### Removed
+- Removed UseWindowsAuthentication because it's not supported with the new library.
+
 ## [1.1.0] - 2023-11-29
 ### Fixed
 - [Breaking] Fixed issue with the attachments can't be given as expression by adding AttachmentOptions class.

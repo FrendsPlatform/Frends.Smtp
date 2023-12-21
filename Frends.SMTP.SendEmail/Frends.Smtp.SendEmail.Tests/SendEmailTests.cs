@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Frends.SMTP.SendEmail.Definitions;
 
 namespace Frends.SMTP.SendEmail.Tests;
@@ -15,8 +16,6 @@ public class SendEmailTests
     private static readonly string TOEMAILADDRESS = Environment.GetEnvironmentVariable("Frends_SMTP_Email");
     private static readonly string FROMEMAILADDRESS = Environment.GetEnvironmentVariable("Frends_SMTP_Email");
     private const int PORT = 587;
-    private const bool USESSL = true;
-    private const bool USEWINDOWSAUTHENTICATION = false;
     // ************************************************************************************************************
 
 
@@ -75,11 +74,12 @@ public class SendEmailTests
             Password = PASSWORD,
             SMTPServer = SMTPADDRESS,
             Port = PORT,
-            UseSsl = USESSL,
-            UseWindowsAuthentication = USEWINDOWSAUTHENTICATION,
+            UseOAuth2 = false,
+            SecureSocket = SecureSocketOption.None
         };
 
     }
+
     [TearDown]
     public void EmailTestTearDown()
     {
@@ -88,17 +88,17 @@ public class SendEmailTests
     }
 
     [Test]
-    public void SendEmailWithPlainText()
+    public async Task SendEmailWithPlainText()
     {
         var input = _input;
         input.Subject = "Email test - PlainText";
 
-        var result = SMTP.SendEmail(input, null, _options, default);
+        var result = await SMTP.SendEmail(input, null, _options, default);
         Assert.IsTrue(result.EmailSent);
     }
 
     [Test]
-    public void SendEmailWithFileAttachment()
+    public async Task SendEmailWithFileAttachment()
     {
         var input = _input;
         input.Subject = "Email test - FileAttachment";
@@ -114,12 +114,12 @@ public class SendEmailTests
 
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-        var result = SMTP.SendEmail(input, Attachments, _options, default);
+        var result = await SMTP.SendEmail(input, Attachments, _options, default);
         Assert.IsTrue(result.EmailSent);
     }
 
     [Test]
-    public void SendEmailWithStringAttachment()
+    public async Task SendEmailWithStringAttachment()
     {
         var input = _input;
         input.Subject = "Email test - AttachmentFromString";
@@ -131,12 +131,12 @@ public class SendEmailTests
         };
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-        var result = SMTP.SendEmail(input, Attachments, _options, default);
+        var result = await SMTP.SendEmail(input, Attachments, _options, default);
         Assert.IsTrue(result.EmailSent);
     }
 
     [Test]
-    public void TrySendingEmailWithNoFileAttachmentFound()
+    public async Task TrySendingEmailWithNoFileAttachmentFound()
     {
         var input = _input;
         input.Subject = "Email test";
@@ -151,12 +151,12 @@ public class SendEmailTests
 
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-        var result = SMTP.SendEmail(input, Attachments, _options, default);
+        var result = await SMTP.SendEmail(input, Attachments, _options, default);
         Assert.IsFalse(result.EmailSent);
     }
 
     [Test]
-    public void TrySendingEmailWithNoCcAndBcc()
+    public async Task TrySendingEmailWithNoCcAndBcc()
     {
         var input = _input2;
         input.Subject = "Email test";
@@ -171,7 +171,7 @@ public class SendEmailTests
 
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-        var result = SMTP.SendEmail(input, Attachments, _options, default);
+        var result = await SMTP.SendEmail(input, Attachments, _options, default);
         Assert.IsFalse(result.EmailSent);
     }
 
@@ -191,7 +191,7 @@ public class SendEmailTests
 
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
-        Assert.Throws<FileNotFoundException>(() => SMTP.SendEmail(input, Attachments, _options, default));
-
+        var ex = Assert.ThrowsAsync<FileNotFoundException>(async () => await SMTP.SendEmail(input, Attachments, _options, default));
+        Assert.AreEqual(@$"The given filepath '{attachment.FilePath}' had no matching files", ex.Message);
     }
 }
