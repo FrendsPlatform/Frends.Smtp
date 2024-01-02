@@ -85,9 +85,7 @@ public static class SMTP
             mail.Body = body;
         }
 
-        using var client = new SmtpClient();
-
-        await ConnectAndAuthenticate(client, SMTPSettings, cancellationToken);
+        using var client = await InitializeSmtpClient(SMTPSettings, cancellationToken);
 
         await client.SendAsync(mail, cancellationToken);
         await client.DisconnectAsync(true, cancellationToken);
@@ -98,8 +96,10 @@ public static class SMTP
     /// <summary>
     /// Initializes new SmtpClient with given parameters.
     /// </summary>
-    private static async Task<bool> ConnectAndAuthenticate(SmtpClient client, Options settings, CancellationToken cancellationToken)
+    private static async Task<SmtpClient> InitializeSmtpClient(Options settings, CancellationToken cancellationToken)
     {
+        var client = new SmtpClient();
+
         var secureSocketOption = settings.SecureSocket switch
         {
             SecureSocketOption.None => SecureSocketOptions.None,
@@ -108,18 +108,21 @@ public static class SMTP
             SecureSocketOption.StartTlsWhenAvailable => SecureSocketOptions.StartTlsWhenAvailable,
             _ => SecureSocketOptions.Auto,
         };
+
         await client.ConnectAsync(settings.SMTPServer, settings.Port, secureSocketOption, cancellationToken);
 
         SaslMechanism mechanism;
 
         if (settings.UseOAuth2)
             mechanism = new SaslMechanismOAuth2(settings.UserName, settings.Token);
+        else if (string.IsNullOrEmpty(settings.Password))
+            return client;
         else
             mechanism = new SaslMechanismLogin(new NetworkCredential(settings.UserName, settings.Password));
 
         await client.AuthenticateAsync(mechanism, cancellationToken);
 
-        return client.IsConnected && client.IsAuthenticated;
+        return client;
     }
 
     /// <summary>
