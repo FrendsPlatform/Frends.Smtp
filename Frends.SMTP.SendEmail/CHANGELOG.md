@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.1] - 2024-01-02
+### Fixed
+- Fixed issue with connecting to SMTP servers which do not support authentication.
+
 ## [1.2.0] - 2023-12-21
 ### Changed
 - Changed Task to use MailKit library instead of deprecated System.Net.Mail.

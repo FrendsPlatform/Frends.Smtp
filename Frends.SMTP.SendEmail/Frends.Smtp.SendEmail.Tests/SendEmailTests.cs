@@ -111,7 +111,6 @@ public class SendEmailTests
             ThrowExceptionIfAttachmentNotFound = true
         };
 
-
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
         var result = await SMTP.SendEmail(input, Attachments, _options, default);
@@ -148,7 +147,6 @@ public class SendEmailTests
             ThrowExceptionIfAttachmentNotFound = false
         };
 
-
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
         var result = await SMTP.SendEmail(input, Attachments, _options, default);
@@ -168,7 +166,6 @@ public class SendEmailTests
             ThrowExceptionIfAttachmentNotFound = false
         };
 
-
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
         var result = await SMTP.SendEmail(input, Attachments, _options, default);
@@ -187,7 +184,6 @@ public class SendEmailTests
             SendIfNoAttachmentsFound = false,
             ThrowExceptionIfAttachmentNotFound = true
         };
-
 
         var Attachments = new AttachmentOptions { Attachments = new Attachment[] { attachment } };
 
