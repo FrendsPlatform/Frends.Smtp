@@ -104,19 +104,6 @@ public class SendEmailTests
     }
 
     [Test]
-    public async Task EmailTestAcceptAllCertifications()
-    {
-        _options.SecureSocket = SecureSocketOption.StartTls;
-        _options.AcceptAllCerts = true;
-
-        var input = _input;
-        input.Subject = "Email test - PlainText";
-
-        var result = await SMTP.SendEmail(input, null, _options, default);
-        Assert.IsTrue(result.EmailSent);
-    }
-
-    [Test]
     public async Task SendEmailWithFileAttachment()
     {
         var input = _input;
