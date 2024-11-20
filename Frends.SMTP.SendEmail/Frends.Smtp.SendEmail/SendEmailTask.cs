@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Frends.SMTP.SendEmail.Definitions;
 using System.Runtime.CompilerServices;
+using System.Net.Security;
 
 [assembly: InternalsVisibleTo("Frends.SMTP.Tests")]
 namespace Frends.SMTP.SendEmail;
@@ -108,6 +109,10 @@ public static class SMTP
 #pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
             client.ServerCertificateValidationCallback = (s, x509certificate, x590chain, sslPolicyErrors) => true;
 #pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
+        }
+        else
+        {
+            client.ServerCertificateValidationCallback = (s, x509certificate, x590chain, sslPolicyErrors) => sslPolicyErrors == SslPolicyErrors.None;
         }
 
         var secureSocketOption = options.SecureSocket switch

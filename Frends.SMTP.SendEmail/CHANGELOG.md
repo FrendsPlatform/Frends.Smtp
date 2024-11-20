@@ -2,7 +2,10 @@
 
 ## [1.3.0] - 2024-09-30
 ### Added
-- [Breaking] Added parameter AcceptAllCerts which will make the Task to accept all server certifications.
+- [Breaking] Added parameter AcceptAllCerts which allows bypassing SSL/TLS certificate validation for SMTP servers.
+	- Default value: false
+    - Warning: Enabling this option poses security risks. Only use when connecting to trusted SMTP servers with self-signed certificates.
+    - Usage: Enable only in controlled environments where certificate validation issues cannot be resolved through proper certificate installation.
 
 ## [1.2.1] - 2024-01-02
 ### Fixed

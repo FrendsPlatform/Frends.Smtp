@@ -31,7 +31,9 @@ public class Options
     public SecureSocketOption SecureSocket { get; set; }
 
     /// <summary>
-    /// Should the task accept all certificates from IMAP server, including invalid ones?
+    /// WARNING: Setting AcceptAllCerts to true disables SSL/TLS certificate validation.
+    /// This should only be used in development/test environments with self-signed certificates.
+    /// Using this option in production environments poses significant security risks.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(false)]

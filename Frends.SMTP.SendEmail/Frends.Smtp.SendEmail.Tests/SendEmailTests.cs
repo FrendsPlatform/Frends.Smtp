@@ -236,14 +236,38 @@ public class SendEmailTests
 
         await SMTP.InitializeSmtpClient(options, default, mockSmtpClient.Object);
 
-        // Assert
+        // Verify connection parameters
         mockSmtpClient.Verify(client => client.ConnectAsync(
-            options.SMTPServer,
+        options.SMTPServer,
         options.Port,
-            SecureSocketOptions.StartTls,
-            default), Times.Once);
+        SecureSocketOptions.StartTls,
+        default), Times.Once);
 
+        // Verify certificate validation behavior
         Assert.IsNotNull(mockSmtpClient.Object.ServerCertificateValidationCallback);
-        Assert.IsTrue(mockSmtpClient.Object.ServerCertificateValidationCallback.Invoke(null, null, null, SslPolicyErrors.None));
+
+        var callback = mockSmtpClient.Object.ServerCertificateValidationCallback;
+
+        // Test various SSL policy errors
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(callback.Invoke(null, null, null, SslPolicyErrors.None), "Should accept valid certificates");
+            Assert.IsTrue(callback.Invoke(null, null, null, SslPolicyErrors.RemoteCertificateNotAvailable), "Should accept missing certificates");
+            Assert.IsTrue(callback.Invoke(null, null, null, SslPolicyErrors.RemoteCertificateNameMismatch), "Should accept mismatched certificates");
+            Assert.IsTrue(callback.Invoke(null, null, null, SslPolicyErrors.RemoteCertificateChainErrors), "Should accept invalid certificate chains");
+        });
+
+        // Test with AcceptAllCerts = false
+        options.AcceptAllCerts = false;
+        await SMTP.InitializeSmtpClient(options, default, mockSmtpClient.Object);
+        callback = mockSmtpClient.Object.ServerCertificateValidationCallback;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(callback.Invoke(null, null, null, SslPolicyErrors.None), "Should accept valid certificates");
+            Assert.IsFalse(callback.Invoke(null, null, null, SslPolicyErrors.RemoteCertificateNotAvailable), "Should reject missing certificates");
+            Assert.IsFalse(callback.Invoke(null, null, null, SslPolicyErrors.RemoteCertificateNameMismatch), "Should reject mismatched certificates");
+            Assert.IsFalse(callback.Invoke(null, null, null, SslPolicyErrors.RemoteCertificateChainErrors), "Should reject invalid certificate chains");
+        });
     }
 }
