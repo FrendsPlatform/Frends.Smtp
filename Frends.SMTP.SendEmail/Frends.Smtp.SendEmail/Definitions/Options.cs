@@ -31,6 +31,13 @@ public class Options
     public SecureSocketOption SecureSocket { get; set; }
 
     /// <summary>
+    /// Should the task accept all certificates from IMAP server, including invalid ones?
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(false)]
+    public bool AcceptAllCerts { get; set; }
+
+    /// <summary>
     /// Set this true if SMTP server expectes OAuth token.
     /// </summary>
     /// <example>true</example>

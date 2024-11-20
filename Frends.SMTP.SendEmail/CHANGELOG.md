@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.0] - 2024-09-30
+### Added
+- [Breaking] Added parameter AcceptAllCerts which will make the Task to accept all server certifications.
+
 ## [1.2.1] - 2024-01-02
 ### Fixed
 - Fixed issue with connecting to SMTP servers which do not support authentication.

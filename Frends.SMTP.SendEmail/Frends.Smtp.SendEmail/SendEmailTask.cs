@@ -12,7 +12,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SMTP.SendEmail.Definitions;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Frends.SMTP.Tests")]
 namespace Frends.SMTP.SendEmail;
 /// <summary>
 /// Main class of the Task.
@@ -96,11 +98,19 @@ public static class SMTP
     /// <summary>
     /// Initializes new SmtpClient with given parameters.
     /// </summary>
-    private static async Task<SmtpClient> InitializeSmtpClient(Options settings, CancellationToken cancellationToken)
+    internal static async Task<SmtpClient> InitializeSmtpClient(Options options, CancellationToken cancellationToken, SmtpClient client = null)
     {
-        var client = new SmtpClient();
+        client ??= new SmtpClient();
 
-        var secureSocketOption = settings.SecureSocket switch
+        // Accept all certs?
+        if (options.AcceptAllCerts)
+        {
+#pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
+            client.ServerCertificateValidationCallback = (s, x509certificate, x590chain, sslPolicyErrors) => true;
+#pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
+        }
+
+        var secureSocketOption = options.SecureSocket switch
         {
             SecureSocketOption.None => SecureSocketOptions.None,
             SecureSocketOption.SslOnConnect => SecureSocketOptions.SslOnConnect,
@@ -109,16 +119,16 @@ public static class SMTP
             _ => SecureSocketOptions.Auto,
         };
 
-        await client.ConnectAsync(settings.SMTPServer, settings.Port, secureSocketOption, cancellationToken);
+        await client.ConnectAsync(options.SMTPServer, options.Port, secureSocketOption, cancellationToken);
 
         SaslMechanism mechanism;
 
-        if (settings.UseOAuth2)
-            mechanism = new SaslMechanismOAuth2(settings.UserName, settings.Token);
-        else if (string.IsNullOrEmpty(settings.Password))
+        if (options.UseOAuth2)
+            mechanism = new SaslMechanismOAuth2(options.UserName, options.Token);
+        else if (string.IsNullOrEmpty(options.Password))
             return client;
         else
-            mechanism = new SaslMechanismLogin(new NetworkCredential(settings.UserName, settings.Password));
+            mechanism = new SaslMechanismLogin(new NetworkCredential(options.UserName, options.Password));
 
         await client.AuthenticateAsync(mechanism, cancellationToken);
 
@@ -134,13 +144,13 @@ public static class SMTP
         var separators = new[] { ',', ';' };
 
         MailboxAddress[] recipients = string.IsNullOrEmpty(input.To)
-            ? Array.Empty<MailboxAddress>()
+            ? []
             : input.To.Split(separators, StringSplitOptions.RemoveEmptyEntries).Select(x => MailboxAddress.Parse(x)).ToArray();
         MailboxAddress[] ccRecipients = string.IsNullOrEmpty(input.Cc)
-            ? Array.Empty<MailboxAddress>()
+            ? []
             : input.Cc.Split(separators, StringSplitOptions.RemoveEmptyEntries).Select(x => MailboxAddress.Parse(x)).ToArray();
         MailboxAddress[] bccRecipients = string.IsNullOrEmpty(input.Bcc)
-            ? Array.Empty<MailboxAddress>()
+            ? []
             : input.Bcc.Split(separators, StringSplitOptions.RemoveEmptyEntries).Select(x => MailboxAddress.Parse(x)).ToArray();
 
         //Create mail object

@@ -1,8 +1,13 @@
 using NUnit.Framework;
+using Moq;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Frends.SMTP.SendEmail.Definitions;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using System.Net.Security;
+using System.Threading;
 
 namespace Frends.SMTP.SendEmail.Tests;
 
@@ -75,7 +80,8 @@ public class SendEmailTests
             SMTPServer = SMTPADDRESS,
             Port = PORT,
             UseOAuth2 = false,
-            SecureSocket = SecureSocketOption.None
+            SecureSocket = SecureSocketOption.None,
+            AcceptAllCerts = false
         };
 
     }
@@ -90,6 +96,19 @@ public class SendEmailTests
     [Test]
     public async Task SendEmailWithPlainText()
     {
+        var input = _input;
+        input.Subject = "Email test - PlainText";
+
+        var result = await SMTP.SendEmail(input, null, _options, default);
+        Assert.IsTrue(result.EmailSent);
+    }
+
+    [Test]
+    public async Task EmailTestAcceptAllCertifications()
+    {
+        _options.SecureSocket = SecureSocketOption.StartTls;
+        _options.AcceptAllCerts = true;
+
         var input = _input;
         input.Subject = "Email test - PlainText";
 
@@ -189,5 +208,42 @@ public class SendEmailTests
 
         var ex = Assert.ThrowsAsync<FileNotFoundException>(async () => await SMTP.SendEmail(input, Attachments, _options, default));
         Assert.AreEqual(@$"The given filepath '{attachment.FilePath}' had no matching files", ex.Message);
+    }
+
+    [Test]
+    public async Task TestAcceptAllCerts()
+    {
+        var options = new Options
+        {
+            AcceptAllCerts = true,
+            SMTPServer = "smtp.example.com",
+            Port = 587,
+            SecureSocket = SecureSocketOption.StartTls,
+            UseOAuth2 = false,
+        };
+
+        var mockSmtpClient = new Mock<SmtpClient> { CallBase = true };
+
+        mockSmtpClient.Setup(client => client.ConnectAsync(
+                It.IsAny<string>(),
+                It.IsAny<int>(),
+                It.IsAny<SecureSocketOptions>(),
+                It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        mockSmtpClient.Setup(client => client.AuthenticateAsync(
+            It.IsAny<SaslMechanism>(),
+            It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        await SMTP.InitializeSmtpClient(options, default, mockSmtpClient.Object);
+
+        // Assert
+        mockSmtpClient.Verify(client => client.ConnectAsync(
+            options.SMTPServer,
+        options.Port,
+            SecureSocketOptions.StartTls,
+            default), Times.Once);
+
+        Assert.IsNotNull(mockSmtpClient.Object.ServerCertificateValidationCallback);
+        Assert.IsTrue(mockSmtpClient.Object.ServerCertificateValidationCallback.Invoke(null, null, null, SslPolicyErrors.None));
     }
 }
