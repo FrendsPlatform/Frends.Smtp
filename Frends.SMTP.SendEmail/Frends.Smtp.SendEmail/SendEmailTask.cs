@@ -144,13 +144,13 @@ public static class SMTP
         var separators = new[] { ',', ';' };
 
         MailboxAddress[] recipients = string.IsNullOrEmpty(input.To)
-            ? []
+            ? Array.Empty<MailboxAddress>()
             : input.To.Split(separators, StringSplitOptions.RemoveEmptyEntries).Select(x => MailboxAddress.Parse(x)).ToArray();
         MailboxAddress[] ccRecipients = string.IsNullOrEmpty(input.Cc)
-            ? []
+            ? Array.Empty<MailboxAddress>()
             : input.Cc.Split(separators, StringSplitOptions.RemoveEmptyEntries).Select(x => MailboxAddress.Parse(x)).ToArray();
         MailboxAddress[] bccRecipients = string.IsNullOrEmpty(input.Bcc)
-            ? []
+            ? Array.Empty<MailboxAddress>()
             : input.Bcc.Split(separators, StringSplitOptions.RemoveEmptyEntries).Select(x => MailboxAddress.Parse(x)).ToArray();
 
         //Create mail object
