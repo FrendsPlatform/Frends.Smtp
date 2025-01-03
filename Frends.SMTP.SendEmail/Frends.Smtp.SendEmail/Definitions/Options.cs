@@ -71,4 +71,12 @@ public class Options
     [DefaultValue("")]
     [UIHint(nameof(UseOAuth2), "", false)]
     public string Password { get; set; }
+
+    /// <summary>
+    /// Thumbprint for server certification.
+    /// </summary>
+    /// <example></example>
+    [PasswordPropertyText(true)]
+    [DefaultValue("")]
+    public string ServerCertificationThumbprint { get; set; }
 }

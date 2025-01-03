@@ -6,16 +6,15 @@ using System.Linq;
 using System.Net;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using System.Security.Cryptography.X509Certificates;
 using MimeKit;
 using MimeKit.Text;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.SMTP.SendEmail.Definitions;
-using System.Runtime.CompilerServices;
 using System.Net.Security;
 
-[assembly: InternalsVisibleTo("Frends.SMTP.Tests")]
 namespace Frends.SMTP.SendEmail;
 /// <summary>
 /// Main class of the Task.
@@ -112,7 +111,18 @@ public static class SMTP
         }
         else
         {
-            client.ServerCertificateValidationCallback = (s, x509certificate, x590chain, sslPolicyErrors) => sslPolicyErrors == SslPolicyErrors.None;
+            client.ServerCertificateValidationCallback = (s, x509certificate, x590chain, sslPolicyErrors) =>
+            {
+                if (!string.IsNullOrEmpty(options.ServerCertificationThumbprint))
+                {
+                    if (x509certificate is X509Certificate2 cert && options.ServerCertificationThumbprint == cert.Thumbprint)
+                        return true;
+                    else
+                        return false;
+                }
+                
+                return sslPolicyErrors == SslPolicyErrors.None;
+            };
         }
 
         var secureSocketOption = options.SecureSocket switch
