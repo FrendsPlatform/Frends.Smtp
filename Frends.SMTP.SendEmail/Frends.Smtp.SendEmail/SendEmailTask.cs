@@ -120,7 +120,7 @@ public static class SMTP
                     else
                         return false;
                 }
-                
+
                 return sslPolicyErrors == SslPolicyErrors.None;
             };
         }

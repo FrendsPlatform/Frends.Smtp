@@ -73,10 +73,19 @@ public class Options
     public string Password { get; set; }
 
     /// <summary>
-    /// Thumbprint for server certification.
+    /// The SHA-1 thumbprint of the server's SSL certificate.
+    /// This provides a secure way to validate the server's identity without accepting all certificates.
+    /// 
+    /// How to obtain the thumbprint:
+    /// 1. View the server's certificate in a browser
+    /// 2. Open certificate details
+    /// 3. Copy the SHA-1 fingerprint/thumbprint
+    ///
+    /// Format: 40 hexadecimal characters (20 bytes)
     /// </summary>
-    /// <example></example>
+    /// <example>a1b2c3d4e5f6g7h8i9j0...</example>
     [PasswordPropertyText(true)]
     [DefaultValue("")]
+    [UIHint(nameof(AcceptAllCerts), "", false)]
     public string ServerCertificationThumbprint { get; set; }
 }
